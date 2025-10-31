@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Your Monthly Statement is Ready</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Your <span th:text="${monthYear}">monthly statement</span> for
+        <span th:text="${companyName}">MoneyTransfer</span> is now available for
+        download.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Statement Period</div>
+            <div class="info-value" th:text="${monthYear}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Document Type</div>
+            <div class="info-value">Monthly Statement</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Format</div>
+            <div class="info-value">PDF</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${statementUrl}" class="button">Download Statement</a>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Important:</strong> Keep your statements for tax and
+        record-keeping purposes. You can access previous statements in your
+        account dashboard at any time.
+      </div>
+
+      <p class="content">
+        If you have any questions about your statement, please contact our
+        support team.
+      </p>
+
+      <p class="content">
+        Thank you for choosing
+        <span th:text="${companyName}">MoneyTransfer</span>.
+      </p>
+    </div>
+  </body>
+</html>

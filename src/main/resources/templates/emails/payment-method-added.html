@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">New Payment Method Added ✅</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        A new payment method has been successfully added to your
+        <span th:text="${companyName}">MoneyTransfer</span> account.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Card Type</div>
+            <div class="info-value" th:text="${cardBrand}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Card Number</div>
+            <div
+              class="info-value"
+              th:text="'**** **** **** ' + ${cardLast4}"
+            ></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Added On</div>
+            <div
+              class="info-value"
+              th:text="${#temporals.format(#temporals.createNow(), 'MMM dd, yyyy')}"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Security Check:</strong> If you didn't add this payment method,
+        please contact our support team immediately at
+        <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}"
+          >support</a
+        >
+        to secure your account.
+      </div>
+
+      <p class="content">
+        You can now use this payment method for faster transfers.
+      </p>
+    </div>
+  </body>
+</html>

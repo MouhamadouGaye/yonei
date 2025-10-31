@@ -1,0 +1,1 @@
+grep -rl "com.app.theNameThaMustBeReplace" ./src | xargs sed -i 's/com\.app\.theNameThaMustBeReplace/com.app.newname/g'

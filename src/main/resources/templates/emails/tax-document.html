@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Important Tax Document Available</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Your <span th:text="${documentType}">tax document</span> for tax year
+        <span th:text="${year}"></span> is now available in your
+        <span th:text="${companyName}">MoneyTransfer</span> account.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Document Type</div>
+            <div class="info-value" th:text="${documentType}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Tax Year</div>
+            <div class="info-value" th:text="${year}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Deadline</div>
+            <div class="info-value">
+              April 15,
+              <span
+                th:text="${#numbers.formatInteger(Integer.parseInt(year) + 1, 1)}"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Tax Filing Information:</strong> This document contains
+        important information you'll need for your tax return. Please review it
+        carefully and provide it to your tax preparer.
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${baseUrl} + '/documents'" class="button"
+          >Access Tax Documents</a
+        >
+      </div>
+
+      <p class="content">
+        If you have questions about this document or need additional tax
+        information, please contact our support team.
+      </p>
+
+      <p class="content">
+        Please note: This is an important tax document. Keep it with your tax
+        records.
+      </p>
+    </div>
+  </body>
+</html>

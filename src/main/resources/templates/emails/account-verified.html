@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{emails/base :: layout(~{::content})}"
+>
+  <!-- FIXED: Added ~{} -->
+
+  >
+  <!-- th:replace="emails/base :: layout(~{::content})" -->
+
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Email Verified Successfully! 🎉</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Congratulations! Your email address has been successfully verified and
+        your <span th:text="${companyName}">MoneyTransfer</span> account is now
+        fully activated.
+      </p>
+
+      <div class="alert-success">
+        <strong>Account Fully Activated:</strong> You now have access to all
+        features including higher transfer limits and enhanced security options.
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Next Steps</div>
+          <div class="info-value">Add payment method</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Transfer Limit</div>
+          <div class="info-value">Increased</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Security</div>
+          <div class="info-value">Enhanced</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Support</div>
+          <div class="info-value">Priority access</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${baseUrl} + '/dashboard'" class="button"
+          >Start Transferring</a
+        >
+      </div>
+
+      <p class="content">
+        Thank you for completing your verification. We're excited to have you as
+        part of our community!
+      </p>
+    </div>
+  </body>
+</html>

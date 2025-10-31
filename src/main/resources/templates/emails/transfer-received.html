@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">You've Received Money! 💰</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Great news! You've received a transfer. The funds are now available in
+        your account.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Amount Received</div>
+            <div class="info-value" th:text="${amount + ' ' + currency}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">From</div>
+            <div class="info-value" th:text="${senderName}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Transaction ID</div>
+            <div class="info-value" th:text="${transactionId}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value" style="color: #48bb78">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${baseUrl} + '/dashboard'" class="button"
+          >View Your Balance</a
+        >
+      </div>
+
+      <p class="content">
+        Thank you for using <span th:text="${companyName}">MoneyTransfer</span>!
+      </p>
+    </div>
+  </body>
+</html>

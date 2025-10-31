@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Transfer Under Review</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Your transfer is currently being reviewed by our security team. This is
+        a standard procedure for certain transactions to ensure the safety of
+        your funds.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Amount</div>
+            <div class="info-value" th:text="${amount + ' ' + currency}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Transaction ID</div>
+            <div class="info-value" th:text="${transactionId}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value" style="color: #ed8936">Under Review</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Estimated Time</div>
+            <div class="info-value">1-4 hours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <strong>What to expect:</strong>
+        <ul style="margin: 10px 0; padding-left: 20px">
+          <li>We'll notify you once the review is complete</li>
+          <li>Funds are temporarily reserved during this process</li>
+          <li>Most reviews are completed within a few hours</li>
+          <li>You may be contacted for additional information</li>
+        </ul>
+      </div>
+
+      <p class="content">
+        If you have any questions about this review, please contact our support
+        team at
+        <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}"
+          >support</a
+        >.
+      </p>
+
+      <p class="content">
+        Thank you for your patience as we work to keep your transactions secure.
+      </p>
+    </div>
+  </body>
+</html>

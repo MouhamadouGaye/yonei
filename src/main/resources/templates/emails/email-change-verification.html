@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Confirm Your Email Change</h1>
+
+      <p class="content">
+        We received a request to change the email address associated with your
+        <span th:text="${companyName}">MoneyTransfer</span> account.
+      </p>
+
+      <p class="content">
+        Please confirm this change by clicking the button below:
+      </p>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${verificationUrl}" class="button">Confirm Email Change</a>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Important:</strong> This confirmation link will expire in 24
+        hours. If you didn't request this change, please ignore this email and
+        contact our support team immediately.
+      </div>
+
+      <p class="content">
+        If the button doesn't work, copy and paste this link into your browser:
+      </p>
+
+      <div class="highlight-box">
+        <code th:text="${verificationUrl}"></code>
+      </div>
+
+      <p class="content">
+        For security reasons, we recommend reviewing your account activity after
+        making this change.
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification</title>
+    <script>
+      // Extract token from URL and show message
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      if (token) {
+        document.getElementById("message").innerHTML =
+          "Token received: " +
+          token +
+          "<br>In a real app, this would verify your email.";
+
+        // In a real scenario, you'd make an API call here
+        fetch("http://localhost:8080/api/users/verify-email?token=" + token)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("result").innerHTML =
+              "Verification result: " + JSON.stringify(data);
+          });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Email Verification</h1>
+    <div id="message">Processing...</div>
+    <div id="result"></div>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Transfer Sent Successfully! ✅</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        Your transfer has been processed successfully. Here are the details:
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Amount Sent</div>
+            <div class="info-value" th:text="${amount + ' ' + currency}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Recipient</div>
+            <div class="info-value" th:text="${recipientName}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Transaction ID</div>
+            <div class="info-value" th:text="${transactionId}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value" style="color: #48bb78">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-success">
+        <strong>Good to know:</strong> The recipient should receive the funds
+        within 1-2 business days.
+      </div>
+
+      <p class="content">
+        Thank you for using <span th:text="${companyName}">MoneyTransfer</span>!
+      </p>
+    </div>
+  </body>
+</html>

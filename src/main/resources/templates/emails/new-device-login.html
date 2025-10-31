@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">New Login Detected</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        We noticed a recent login to your
+        <span th:text="${companyName}">MoneyTransfer</span> account from a new
+        device or location.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Device/Location</div>
+            <div class="info-value" th:text="${deviceInfo}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Approximate Location</div>
+            <div class="info-value" th:text="${location}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Time</div>
+            <div
+              class="info-value"
+              th:text="${#temporals.format(#temporals.createNow(), 'MMM dd, yyyy HH:mm')}"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Is this you?</strong> If you recognize this activity, no action
+        is needed. If this doesn't look familiar, please take these steps
+        immediately:
+        <ul style="margin: 10px 0; padding-left: 20px">
+          <li>Change your password</li>
+          <li>Review your recent transactions</li>
+          <li>Contact our support team</li>
+          <li>Enable two-factor authentication</li>
+        </ul>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${baseUrl} + '/security'" class="button"
+          >Review Account Security</a
+        >
+      </div>
+
+      <p class="content">
+        Stay vigilant,<br />The
+        <span th:text="${companyName}">MoneyTransfer</span> Security Team
+      </p>
+    </div>
+  </body>
+</html>

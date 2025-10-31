@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">Large Transfer Alert</h1>
+
+      <p class="content">Hello <span th:text="${username}">User</span>,</p>
+
+      <p class="content">
+        This is a security alert regarding a large transfer from your
+        <span th:text="${companyName}">MoneyTransfer</span> account.
+      </p>
+
+      <div class="highlight-box">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Transfer Amount</div>
+            <div class="info-value" th:text="${amount + ' ' + currency}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Time</div>
+            <div
+              class="info-value"
+              th:text="${#temporals.format(#temporals.createNow(), 'MMM dd, yyyy HH:mm')}"
+            ></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value" style="color: #48bb78">Processed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Security Check:</strong> Large transfers may trigger additional
+        security reviews. This is a standard procedure to protect your account
+        from unauthorized activity.
+      </div>
+
+      <p class="content">
+        If you authorized this transfer, no action is required. If you did not
+        make this transfer, please contact our support team immediately at
+        <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}"
+          >support</a
+        >.
+      </p>
+
+      <p class="content">Thank you for helping us keep your account secure.</p>
+    </div>
+  </body>
+</html>

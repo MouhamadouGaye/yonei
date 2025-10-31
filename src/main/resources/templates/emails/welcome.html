@@ -1,0 +1,231 @@
+<!-- <!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{emails/base :: layout(~{::content})}"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1 class="greeting">
+        Welcome to <span th:text="${companyName}">MoneyTransfer</span>,
+        <span th:text="${username}">User</span>! 🎉
+      </h1>
+
+      <p class="content">
+        We're thrilled to have you on board. Your account has been successfully
+        created and you're now ready to start sending and receiving money
+        globally.
+      </p>
+
+      <div class="alert-success">
+        <strong>Get Started:</strong> Verify your email address to unlock all
+        features and ensure the security of your account.
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Fast Transfers</div>
+          <div class="info-value">Send money in minutes</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Low Fees</div>
+          <div class="info-value">Competitive rates</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Global Reach</div>
+          <div class="info-value">150+ countries</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Secure</div>
+          <div class="info-value">Bank-level security</div>
+        </div>
+      </div>
+
+      <p class="content">
+        If you have any questions, our support team is here to help at
+        <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}"
+          >support</a
+        >.
+      </p>
+
+      <p class="content">
+        Happy transferring!<br />The
+        <span th:text="${companyName}">MoneyTransfer</span> Team
+      </p>
+    </div>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to MoneyTransfer</title>
+    <style>
+      /* COPY ALL THE CSS FROM YOUR base.html HERE */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8fafc;
+      }
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .email-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 40px;
+        text-align: center;
+      }
+      .email-logo {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .email-tagline {
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      .email-body {
+        padding: 40px;
+      }
+      .greeting {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #1a202c;
+      }
+      .content {
+        font-size: 16px;
+        color: #4a5568;
+        margin-bottom: 25px;
+      }
+      .alert-success {
+        background: #f0fff4;
+        border: 1px solid #c6f6d5;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+        border-left: 4px solid #48bb78;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .info-item {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+      }
+      .info-label {
+        font-size: 12px;
+        color: #718096;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      .email-footer {
+        background: #f7fafc;
+        padding: 30px 40px;
+        text-align: center;
+        color: #718096;
+        font-size: 14px;
+      }
+      @media (max-width: 600px) {
+        .email-body {
+          padding: 30px 20px;
+        }
+        .email-header {
+          padding: 25px 20px;
+        }
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <div class="email-logo" th:text="${companyName}">MoneyTransfer</div>
+        <div class="email-tagline">Secure. Fast. Global.</div>
+      </div>
+
+      <div class="email-body">
+        <!-- PASTE THE CONTENT FROM YOUR WELCOME TEMPLATE HERE -->
+        <h1 class="greeting">
+          Welcome to <span th:text="${companyName}">MoneyTransfer</span>,
+          <span th:text="${username}">User</span>! 🎉
+        </h1>
+        <p class="content">
+          We're thrilled to have you on board. Your account has been
+          successfully created and you're now ready to start sending and
+          receiving money globally.
+        </p>
+        <div class="alert-success">
+          <strong>Get Started:</strong> Verify your email address to unlock all
+          features and ensure the security of your account.
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Fast Transfers</div>
+            <div class="info-value">Send money in minutes</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Low Fees</div>
+            <div class="info-value">Competitive rates</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Global Reach</div>
+            <div class="info-value">150+ countries</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Secure</div>
+            <div class="info-value">Bank-level security</div>
+          </div>
+        </div>
+        <p class="content">
+          If you have any questions, our support team is here to help at
+          <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}"
+            >support</a
+          >.
+        </p>
+        <p class="content">
+          Happy transferring!<br />The
+          <span th:text="${companyName}">MoneyTransfer</span> Team
+        </p>
+      </div>
+
+      <div class="email-footer">
+        <p>
+          © 2024 <span th:text="${companyName}">MoneyTransfer</span>. All rights
+          reserved.
+        </p>
+        <p style="margin-top: 15px; font-size: 12px; color: #a0aec0">
+          This is an automated message. Please do not reply to this email.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

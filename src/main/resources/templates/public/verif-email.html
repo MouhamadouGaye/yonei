@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - MoneyTransfer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+      }
+
+      .success-icon {
+        font-size: 64px;
+        color: #10b981;
+        margin-bottom: 20px;
+      }
+
+      .error-icon {
+        font-size: 64px;
+        color: #ef4444;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        color: #1f2937;
+        margin-bottom: 16px;
+        font-size: 28px;
+      }
+
+      p {
+        color: #6b7280;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      .button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 8px;
+        transition: transform 0.2s;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+      }
+
+      .button-secondary {
+        background: #e5e7eb;
+        color: #374151;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f4f6;
+        border-radius: 50%;
+        border-top-color: #667eea;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .token-box {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        word-break: break-all;
+        border: 1px solid #e5e7eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Success State -->
+      <div id="successState" style="display: none">
+        <div class="success-icon">✅</div>
+        <h1>Email Verified Successfully!</h1>
+        <p>
+          Your email address has been verified. You can now log in to your
+          MoneyTransfer account.
+        </p>
+        <a href="/login" class="button">Go to Login</a>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" style="display: none">
+        <div class="error-icon">❌</div>
+        <h1>Verification Failed</h1>
+        <p id="errorMessage">
+          There was a problem verifying your email address.
+        </p>
+        <button onclick="retryVerification()" class="button">Try Again</button>
+        <a
+          href="mailto:support@moneytransfer.com"
+          class="button button-secondary"
+          >Contact Support</a
+        >
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState">
+        <div class="loading"></div>
+        <h1>Verifying Your Email</h1>
+        <p>Please wait while we verify your email address...</p>
+      </div>
+
+      <!-- Token Display -->
+      <div class="token-box">
+        <strong>Verification Token:</strong>
+        <div id="tokenDisplay" th:text="${token}"></div>
+        <button
+          onclick="copyToken()"
+          style="
+            margin-top: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+          "
+        >
+          Copy Token
+        </button>
+      </div>
+
+      <p style="font-size: 14px; color: #9ca3af; margin-top: 20px">
+        If verification doesn't complete automatically, copy the token above and
+        use it in the mobile app.
+      </p>
+    </div>
+
+    <script>
+      // Get the token from Thymeleaf
+      const token = document.getElementById("tokenDisplay").textContent;
+
+      // Verify email immediately when page loads
+      if (token) {
+        verifyEmail(token);
+      } else {
+        showError("No verification token found");
+      }
+
+      async function verifyEmail(verificationToken) {
+        try {
+          const response = await fetch(
+            "http://localhost:8080/api/users/verify-email?token=" +
+              verificationToken,
+            {
+              method: "POST",
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showSuccess();
+          } else {
+            showError(data.error || "Verification failed");
+          }
+        } catch (error) {
+          console.error("Verification error:", error);
+          showError(
+            "Network error. Please check your connection and try again."
+          );
+        }
+      }
+
+      function showSuccess() {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("successState").style.display = "block";
+      }
+
+      function showError(message) {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("errorState").style.display = "block";
+        document.getElementById("errorMessage").textContent = message;
+      }
+
+      function retryVerification() {
+        document.getElementById("errorState").style.display = "none";
+        document.getElementById("loadingState").style.display = "block";
+        verifyEmail(token);
+      }
+
+      function copyToken() {
+        navigator.clipboard.writeText(token).then(() => {
+          alert("Token copied to clipboard!");
+        });
+      }
+    </script>
+  </body>
+</html>

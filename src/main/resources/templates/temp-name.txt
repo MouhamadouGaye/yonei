@@ -1,0 +1,26 @@
+templates/emails/
+├── base.html
+├── welcome.html
+├── account-verification.html
+├── account-verified.html
+├── password-reset.html
+├── password-changed.html
+├── password-change-notification.html
+├── email-change-verification.html
+├── email-change-confirmation.html
+├── two-factor-code.html
+├── suspicious-activity.html
+├── transfer-sent.html
+├── transfer-received.html
+├── transfer-failed.html
+├── transfer-pending.html
+├── payment-method-added.html
+├── payment-method-removed.html
+├── new-device-login.html
+├── large-transfer-alert.html
+├── balance-threshold.html
+├── monthly-statement.html
+├── tax-document.html
+├── compliance-update.html
+├── admin-security-alert.html
+└── system-maintenance.html

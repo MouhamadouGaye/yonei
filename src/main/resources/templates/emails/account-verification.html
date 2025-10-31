@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="emails/base :: html">
+  <head>
+    <title th:text="${subject}">Verify Your Email - MoneyTransfer</title>
+  </head>
+  <body>
+    <div th:replace="~{emails/base :: content}">
+      <!-- This entire div replaces the content fragment -->
+      <h1 class="greeting">Verify Your Email Address</h1>
+
+      <p class="content">Hello <strong th:text="${username}">User</strong>,</p>
+
+      <p class="content">
+        Welcome to <strong th:text="${companyName}">MoneyTransfer</strong>!
+        Please verify your email address to activate your account and start
+        sending money securely.
+      </p>
+
+      <div style="text-align: center; margin: 32px 0">
+        <a th:href="${verificationUrl}" class="button">
+          Verify Email Address
+        </a>
+      </div>
+
+      <div class="alert-warning">
+        <strong>Important:</strong> This verification link will expire in
+        <strong>24 hours</strong> for security reasons.
+      </div>
+
+      <p class="content">
+        If the button above doesn't work, copy and paste the following link into
+        your web browser:
+      </p>
+
+      <div class="highlight-box">
+        <code th:text="${verificationUrl}">verification-url</code>
+      </div>
+
+      <p class="content">
+        If you didn't create an account with us, please ignore this email. Your
+        email address will not be used for any purpose.
+      </p>
+
+      <p class="content">
+        Need help? Contact our support team at
+        <a
+          th:href="'mailto:' + ${supportEmail}"
+          style="color: #667eea; text-decoration: none"
+        >
+          <span th:text="${supportEmail}">support@moneytransfer.com</span>
+        </a>
+      </p>
+    </div>
+  </body>
+</html>

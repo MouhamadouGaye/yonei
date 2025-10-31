@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="emails/base :: layout(~{::content})"
+>
+  <head></head>
+  <body>
+    <div th:fragment="content">
+      <h1
+        class="greeting"
+        th:styleappend="${severity == 'HIGH'} ? 'color: #e53e3e;' : (${severity == 'MEDIUM'} ? 'color: #ed8936;' : 'color: #38a169;')"
+      >
+        <span th:if="${severity == 'HIGH'}">🚨 CRITICAL</span>
+        <span th:if="${severity == 'MEDIUM'}">⚠️ IMPORTANT</span>
+        <span th:if="${severity == 'LOW'}">ℹ️ NOTICE</span>
+        Security Alert
+      </h1>
+
+      <p class="content">
+        Security alert for
+        <span th:text="${companyName}">MoneyTransfer</span> administration:
+      </p>
+
+      <div
+        class="highlight-box"
+        th:styleappend="${severity == 'HIGH'} ? 'border-left-color: #e53e3e; background: #fed7d7;' : (${severity == 'MEDIUM'} ? 'border-left-color: #ed8936; background: #fffaf0;' : 'border-left-color: #38a169; background: #f0fff4;')"
+      >
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Alert Type</div>
+            <div class="info-value" th:text="${alertType}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Severity</div>
+            <div class="info-value" th:text="${severity}"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Timestamp</div>
+            <div class="info-value" th:text="${timestamp}"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <strong>Alert Description:</strong><br />
+        <span th:text="${description}"></span>
+      </div>
+
+      <div th:if="${severity == 'HIGH'}" class="alert-error">
+        <strong>IMMEDIATE ACTION REQUIRED:</strong>
+        <ul style="margin: 10px 0; padding-left: 20px">
+          <li>Review system logs immediately</li>
+          <li>Check affected user accounts</li>
+          <li>Implement security measures</li>
+          <li>Notify security team</li>
+        </ul>
+      </div>
+
+      <div th:if="${severity == 'MEDIUM'}" class="alert-warning">
+        <strong>Review Required:</strong> Please investigate this alert and take
+        appropriate action within 24 hours.
+      </div>
+
+      <div th:if="${severity == 'LOW'}" class="alert-success">
+        <strong>For Your Information:</strong> This alert requires monitoring
+        but no immediate action.
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <a th:href="${baseUrl} + '/admin/security'" class="button"
+          >View Security Dashboard</a
+        >
+      </div>
+
+      <p class="content">
+        This is an automated security alert from the
+        <span th:text="${companyName}">MoneyTransfer</span> monitoring system.
+      </p>
+    </div>
+  </body>
+</html>
