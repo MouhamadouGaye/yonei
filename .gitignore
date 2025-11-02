@@ -9,6 +9,9 @@ env/
 ./env.production
 ./env.development
 .DS_Store
+
+send-receive
+/send-receive
 ### STS ###
 .apt_generated
 .classpath

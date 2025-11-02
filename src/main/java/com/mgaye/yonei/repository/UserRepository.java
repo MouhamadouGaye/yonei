@@ -37,4 +37,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.stripeCustomerId = :stripeCustomerId")
     Optional<User> findByStripeCustomerId(@Param("stripeCustomerId") String stripeCustomerId);
 
+    // Add this for debugging
+    @Query("SELECT COUNT(u) FROM User u WHERE u.email = :email")
+    long countByEmail(@Param("email") String email);
+
 }

@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.mgaye.yonei.entity.Card;
+import com.mgaye.yonei.entity.User;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
+
+    Long countByUserId(User user);
 
     // 🔎 Find by Stripe PaymentMethod ID
     Optional<Card> findByStripePaymentMethodId(String stripePaymentMethodId);
@@ -25,5 +28,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     Optional<Card> findDefaultCardByUserId(@Param("userId") Long userId);
 
     void deleteByStripePaymentMethodId(String stripePaymentMethodId);
+
+    long countByUser(User user);
 
 }

@@ -97,6 +97,7 @@ package com.mgaye.yonei.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -130,7 +131,56 @@ public class JwtFilter extends OncePerRequestFilter {
     public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+
+        // Add this debug line
+        logger.info("🔧 UserDetailsService implementation: {}", userDetailsService.getClass().getName());
+
     }
+
+    // @Override
+    // protected void doFilterInternal(HttpServletRequest request,
+    // HttpServletResponse response,
+    // FilterChain filterChain)
+    // throws ServletException, IOException {
+
+    // String token = null;
+
+    // // Extract JWT from cookies
+    // if (request.getCookies() != null) {
+    // for (Cookie cookie : request.getCookies()) {
+    // if ("jwt".equals(cookie.getName())) {
+    // token = cookie.getValue();
+    // }
+    // }
+
+    // }
+
+    // if (token != null) {
+    // try {
+    // String username = jwtUtil.extractUsername(token);
+
+    // if (username != null &&
+    // SecurityContextHolder.getContext().getAuthentication() == null) {
+    // UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+    // if (jwtUtil.validateToken(token, userDetails)) {
+    // UsernamePasswordAuthenticationToken auth = new
+    // UsernamePasswordAuthenticationToken(
+    // userDetails,
+    // null,
+    // userDetails.getAuthorities());
+
+    // SecurityContextHolder.getContext().setAuthentication(auth);
+    // }
+    // }
+    // } catch (Exception e) {
+    // // Optionally log invalid/expired token
+    // logger.warn("JWT validation failed: {}", e.getMessage());
+    // }
+    // }
+
+    // filterChain.doFilter(request, response);
+    // }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -138,41 +188,65 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+        log.info("🔐 JWT Filter - Checking request to: {}", request.getRequestURI());
+
         String token = null;
 
         // Extract JWT from cookies
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
+                log.info("🍪 Found cookie: {}", cookie.getName());
                 if ("jwt".equals(cookie.getName())) {
                     token = cookie.getValue();
+                    log.info("✅ JWT token found, length: {}", token.length());
+                    break;
                 }
             }
         }
 
         if (token != null) {
             try {
+                log.info("🔍 Validating JWT token...");
                 String username = jwtUtil.extractUsername(token);
+                log.info("📧 Extracted username: {}", username);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (username != null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    log.info("✅ User details loaded: {}", userDetails.getUsername());
 
                     if (jwtUtil.validateToken(token, userDetails)) {
+                        log.info("✅ JWT token is valid");
+
                         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
                                 userDetails.getAuthorities());
 
+                        // 🔥 CRITICAL: This is what actually authenticates the user
                         SecurityContextHolder.getContext().setAuthentication(auth);
+                        log.info("🎯 SPRING SECURITY CONTEXT SET - User is now authenticated: {}",
+                                auth.isAuthenticated());
+
+                    } else {
+                        log.warn("❌ JWT token validation failed");
                     }
                 }
             } catch (Exception e) {
-                // Optionally log invalid/expired token
-                logger.warn("JWT validation failed: {}", e.getMessage());
+                log.error("💥 JWT processing error: {}", e.getMessage(), e);
             }
+        } else {
+            log.warn("❌ No JWT token found in request");
         }
+
+        // Check what we have after processing
+        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("🔍 After JWT filter - Authentication: {}",
+                currentAuth != null ? currentAuth.getName() + " (authenticated: " + currentAuth.isAuthenticated() + ")"
+                        : "NULL");
 
         filterChain.doFilter(request, response);
     }
+
 }
 
 // @Component

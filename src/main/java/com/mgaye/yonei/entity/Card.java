@@ -1,5 +1,8 @@
 package com.mgaye.yonei.entity;
 
+import java.time.Instant;
+import java.time.YearMonth;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,13 +35,30 @@ public class Card {
     private User user;
 
     @Column(nullable = false, unique = true)
-    private String stripePaymentMethodId; // ✅ Safe Stripe reference
+    private String stripePaymentMethodId;
 
-    private String brand; // e.g., "Visa"
-    private String last4; // e.g., "4242"
-    private Integer expMonth; // e.g., 12
-    private Integer expYear; // e.g., 2028
+    private String brand; // "visa", "mastercard", "amex"
+    private String last4; // "4242"
+    private Integer expMonth; // 12
+    private Integer expYear; // 2028
 
     @Column(nullable = false)
-    private Boolean isDefault = false; // user’s preferred card
+    private Boolean isDefault = false;
+
+    @Column(name = "created_at")
+    private Instant createdAt = Instant.now();
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
+    // Helper method for display
+    public String getDisplayName() {
+        return String.format("%s ****%s", brand, last4);
+    }
+
+    public boolean isExpired() {
+        YearMonth now = YearMonth.now();
+        YearMonth expiry = YearMonth.of(expYear, expMonth);
+        return expiry.isBefore(now);
+    }
 }

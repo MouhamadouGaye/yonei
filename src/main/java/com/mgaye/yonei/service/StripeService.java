@@ -115,6 +115,16 @@ public class StripeService {
                 .collect(Collectors.toList());
     }
 
+    public PaymentMethod getPaymentMethodFromIntent(String paymentIntentId) throws StripeException {
+        PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+        String paymentMethodId = paymentIntent.getPaymentMethod();
+
+        if (paymentMethodId != null) {
+            return PaymentMethod.retrieve(paymentMethodId);
+        }
+        return null;
+    }
+
     /**
      * Charge a customer using their saved payment method
      */
