@@ -1,1 +1,6 @@
 grep -rl "com.app.theNameThaMustBeReplace" ./src | xargs sed -i 's/com\.app\.theNameThaMustBeReplace/com.app.newname/g'
+
+
+phoneNumber.matches("^[+]?[0-9]{10,15}$")
+email.matches("^[A-Za-z0-9+_.-]+@(.+)$")
+password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")

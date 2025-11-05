@@ -6,6 +6,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.LockModeType;
+
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
@@ -15,15 +17,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByName(String name);
 
     // ✅ ADD THIS MISSING METHOD
-    Optional<User> findByEmailVerificationToken(String token);
+    Optional<User> findByEmailVerificationToken(String token); // this was used but does not works I took the
+                                                               // findByVerificationToken()
+
+    // Alternative if the above doesn't work
+    @Query("SELECT u FROM User u WHERE u.emailVerificationToken = :token")
+    Optional<User> findByVerificationToken(@Param("token") String token);
+
+    // ✅ Even better - include expiry check
+    @Query("SELECT u FROM User u WHERE u.emailVerificationToken = :token AND u.tokenExpiry > :now")
+    Optional<User> findValidVerificationToken(@Param("token") String token, @Param("now") Instant now);
 
     // ✅ ADD THESE ADDITIONAL METHODS FOR SECURITY
     boolean existsByEmail(String email);
 
-    boolean existsByUsername(String username);
+    boolean existsByName(String username);
 
     boolean existsByPhoneNumber(String phoneNumber);
 

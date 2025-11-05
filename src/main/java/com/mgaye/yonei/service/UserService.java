@@ -192,6 +192,7 @@
 package com.mgaye.yonei.service;
 
 import com.mgaye.yonei.entity.User;
+import com.mgaye.yonei.dto.CountryCodeEntry;
 import com.mgaye.yonei.entity.Card;
 import com.mgaye.yonei.repository.UserRepository;
 import com.mgaye.yonei.repository.CardRepository;
@@ -220,15 +221,17 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final AuditService auditService;
+    private final CountryCodeService countryCodeService;
 
     public UserService(UserRepository userRepository, CardRepository cardRepository,
             PasswordEncoder passwordEncoder, EmailService emailService,
-            AuditService auditService) {
+            AuditService auditService, CountryCodeService countryCodeService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.cardRepository = cardRepository;
         this.emailService = emailService;
         this.auditService = auditService;
+        this.countryCodeService = countryCodeService;
     }
 
     public User verifyEmail(String token) {
@@ -333,7 +336,45 @@ public class UserService implements UserDetailsService {
     /**
      * Enhanced user creation with email verification
      */
-    @Transactional
+    // @Transactional
+    // public User createUser(String username, String email, String rawPassword,
+    // String phoneNumber) {
+    // // Validate password strength during registration
+    // if (!isValidPassword(rawPassword)) {
+    // throw new RuntimeException("Password does not meet security requirements");
+    // }
+
+    // // Check if email already exists
+    // if (userRepository.existsByEmail(email)) {
+    // throw new RuntimeException("Email already registered");
+    // }
+
+    // // Generate email verification token
+    // String verificationToken = generateVerificationToken();
+
+    // User user = User.builder()
+    // .name(username)
+    // .email(email.toLowerCase().trim())
+    // .password(passwordEncoder.encode(rawPassword))
+    // .phoneNumber(phoneNumber)
+    // .balance(BigDecimal.ZERO)
+    // .createdAt(Instant.now())
+    // .emailVerificationToken(verificationToken)
+    // .tokenExpiry(Instant.now().plusSeconds(24 * 60 * 60)) // 24 hours
+    // .emailVerified(false)
+    // .failedLoginAttempts(0)
+    // .accountLocked(false)
+    // .build();
+
+    // User savedUser = userRepository.save(user);
+
+    // // Log registration event
+    // auditService.logSecurityEvent(savedUser.getId(), "USER_REGISTERED",
+    // "New user registration with email: " + email);
+
+    // return savedUser;
+    // }
+
     public User createUser(String username, String email, String rawPassword, String phoneNumber) {
         // Validate password strength during registration
         if (!isValidPassword(rawPassword)) {
@@ -345,11 +386,17 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Email already registered");
         }
 
+        // 🔥 Determine currency based on phone number
+        String currency = countryCodeService.getCurrencyByPhoneNumber(phoneNumber);
+        String countryCode = getCountryCodeFromPhoneNumber(phoneNumber);
+
+        System.out.println("🌍 Setting currency: " + currency + " for phone: " + phoneNumber);
+
         // Generate email verification token
         String verificationToken = generateVerificationToken();
 
         User user = User.builder()
-                .username(username)
+                .name(username)
                 .email(email.toLowerCase().trim())
                 .password(passwordEncoder.encode(rawPassword))
                 .phoneNumber(phoneNumber)
@@ -360,15 +407,28 @@ public class UserService implements UserDetailsService {
                 .emailVerified(false)
                 .failedLoginAttempts(0)
                 .accountLocked(false)
+                .currency(currency) // 🔥 Set the currency
+                .countryCode(countryCode) // 🔥 Set country code if you have this field
                 .build();
 
         User savedUser = userRepository.save(user);
 
         // Log registration event
         auditService.logSecurityEvent(savedUser.getId(), "USER_REGISTERED",
-                "New user registration with email: " + email);
+                "New user registration with email: " + email + ", currency: " + currency);
 
         return savedUser;
+    }
+
+    // 🔥 Helper method to get country code
+    private String getCountryCodeFromPhoneNumber(String phoneNumber) {
+        try {
+            CountryCodeEntry country = countryCodeService.getCountryByPhoneNumber(phoneNumber);
+            return country != null ? country.getCode() : "INTL";
+        } catch (Exception e) {
+            System.err.println("❌ Error getting country code for phone: " + phoneNumber + " - " + e.getMessage());
+            return "INTL";
+        }
     }
 
     /**
@@ -403,8 +463,8 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
 
         // Send password change notification
-        emailService.sendPasswordChangedEmail(user.getEmail(), user.getUsername());
-        emailService.sendPasswordChangeNotification(user.getEmail(), user.getUsername());
+        emailService.sendPasswordChangedEmail(user.getEmail(), user.getName());
+        emailService.sendPasswordChangeNotification(user.getEmail(), user.getName());
 
         auditService.logSecurityEvent(userId, "PASSWORD_CHANGED",
                 "Password successfully updated");
@@ -545,7 +605,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (username != null && !username.trim().isEmpty()) {
-            user.setUsername(username.trim());
+            user.setName(username.trim());
         }
 
         if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {

@@ -113,7 +113,9 @@ import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -171,8 +173,8 @@ public class UserController {
 
                 if (request.getName() != null && !request.getName().trim().isEmpty()
                                 && !request.getName().trim().equals(user.getUsername())) {
-                        changes.put("username", user.getUsername() + " -> " + request.getName());
-                        user.setUsername(request.getName().trim());
+                        changes.put("Name", user.getName() + " -> " + request.getName());
+                        user.setName(request.getName().trim());
                 }
 
                 if (request.getPhoneNumber() != null && !request.getPhoneNumber().trim().isEmpty()
@@ -194,7 +196,7 @@ public class UserController {
                         // Send profile update notification
                         emailService.sendSuspiciousActivityAlert(
                                         user.getEmail(),
-                                        user.getUsername(),
+                                        user.getName(),
                                         "Profile information updated: " + String.join(", ", changes.keySet()));
                 }
 
@@ -247,7 +249,7 @@ public class UserController {
                         emailService.sendEmailChangeConfirmation(
                                         user.getEmail(),
                                         user.getPendingEmail(), // This should be the old email after confirmation
-                                        user.getUsername());
+                                        user.getName());
 
                         auditService.logSecurityEvent(user.getId(), "EMAIL_CHANGE_COMPLETED",
                                         "Email successfully changed");
@@ -274,8 +276,8 @@ public class UserController {
                                         request.getNewPassword());
 
                         // Send password change notification
-                        emailService.sendPasswordChangedEmail(user.getEmail(), user.getUsername());
-                        emailService.sendPasswordChangeNotification(user.getEmail(), user.getUsername());
+                        emailService.sendPasswordChangedEmail(user.getEmail(), user.getName());
+                        emailService.sendPasswordChangeNotification(user.getEmail(), user.getName());
 
                         auditService.logSecurityEvent(user.getId(), "PASSWORD_CHANGED",
                                         "Password successfully updated");
@@ -292,7 +294,7 @@ public class UserController {
 
         // // ✅ SECURE USER REGISTRATION
         // @PostMapping("/register")
-        // public ResponseEntity<UserDto> register(@Valid @RequestBody
+        // public ResponseEntity<UserDto> registerR(@Valid @RequestBody
         // RegistrationRequest request) {
         // // Additional validation for money transfer app
         // if (!isValidPhoneNumber(request.getPhoneNumber())) {
@@ -322,8 +324,8 @@ public class UserController {
         // user.getUsername());
         // }
 
-        // auditService.logSecurityEvent(user.getId(), "USER_REGISTERED", "New
-        // userregistration");
+        // auditService.logSecurityEvent(user.getId(), "USER_REGISTERED",
+        // "Newuserregistration");
 
         // UserDto response = UserDto.fromEntity(user, false);
         // response.setPassword(null); // Never return password
@@ -347,9 +349,9 @@ public class UserController {
                                 return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
                         }
 
-                        logger.info("Creating user: {}", request.getUsername());
+                        logger.info("Creating user: {}", request.getName());
                         User user = userService.createUser(
-                                        request.getUsername().trim(),
+                                        request.getName().trim(),
                                         request.getEmail().toLowerCase().trim(),
                                         request.getPassword(),
                                         request.getPhoneNumber().trim());
@@ -358,7 +360,7 @@ public class UserController {
 
                         // Send welcome email
                         try {
-                                emailService.sendWelcomeEmail(user.getEmail(), user.getUsername());
+                                emailService.sendWelcomeEmail(user.getEmail(), user.getName());
                                 logger.info("Welcome email sent to: {}", user.getEmail());
                         } catch (Exception e) {
                                 logger.error("Failed to send welcome email: {}", e.getMessage());
@@ -370,7 +372,7 @@ public class UserController {
                                         emailService.sendAccountVerificationEmail(
                                                         user.getEmail(),
                                                         user.getEmailVerificationToken(),
-                                                        user.getUsername());
+                                                        user.getName());
                                         logger.info("Verification email sent to: {}", user.getEmail());
                                 } catch (Exception e) {
                                         logger.error("Failed to send verification email: {}", e.getMessage());
@@ -401,10 +403,259 @@ public class UserController {
                 return "simple-test"; // We'll create this file
         }
 
+        // @GetMapping("/verify-email-page")
+        // public String verifyEmailPage(@RequestParam String token, Model model) {
+        // model.addAttribute("token", token);
+        // return "public/verif-email"; // This should match your HTML template name
+        // }
+
+        @GetMapping("/verify-email")
+        public ResponseEntity<String> verifyEmaill(@RequestParam String token) {
+                try {
+                        System.out.println("🔐 Verifying email with token: " + token);
+
+                        // Find user by verification token
+                        Optional<User> userOpt = userRepository.findByEmailVerificationToken(token);
+
+                        if (userOpt.isEmpty()) {
+                                System.out.println("❌ Invalid verification token: " + token);
+                                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                                .body("Invalid verification token");
+                        }
+
+                        User user = userOpt.get();
+
+                        // Check if token is expired
+                        if (user.getTokenExpiry() != null && user.getTokenExpiry().isBefore(Instant.now())) {
+                                System.out.println("❌ Verification token expired for user: " + user.getEmail());
+                                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                                .body("Verification token has expired");
+                        }
+
+                        // Update user as verified
+                        user.setEmailVerified(true);
+                        user.setEmailVerificationToken(null); // Clear the token
+                        user.setTokenExpiry(null); // Clear expiry
+                        userRepository.save(user);
+
+                        System.out.println("✅ Email verified successfully for: " + user.getEmail());
+
+                        return ResponseEntity.ok("Email verified successfully");
+
+                } catch (Exception e) {
+                        System.err.println("❌ Email verification error: " + e.getMessage());
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body("Verification failed");
+                }
+        }
+
+        // // Your HTML page endpoint
+        // @GetMapping("/verify-email-page")
+        // public String verifyEmailPage(@RequestParam String token, Model model) {
+        // try {
+        // System.out.println("🌐 Verification page requested for token: " + token);
+
+        // Optional<User> userOpt = userRepository.findByEmailVerificationToken(token);
+
+        // if (userOpt.isEmpty()) {
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Invalid verification token");
+        // return "verification-result";
+        // }
+
+        // User user = userOpt.get();
+
+        // // Check if already verified
+        // if (user.isEmailVerified()) {
+        // model.addAttribute("success", true);
+        // model.addAttribute("message", "Email already verified");
+        // return "verification-result";
+        // }
+
+        // // Check if token expired
+        // if (user.getTokenExpiry() != null &&
+        // user.getTokenExpiry().isBefore(Instant.now())) {
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Verification token has expired");
+        // return "verification-result";
+        // }
+
+        // // Verify the user
+        // user.setEmailVerified(true);
+        // user.setEmailVerificationToken(null);
+        // user.setTokenExpiry(null);
+        // userRepository.save(user);
+
+        // System.out.println("✅ Email verified via page for: " + user.getEmail());
+
+        // model.addAttribute("success", true);
+        // model.addAttribute("message", "Email verified successfully!");
+        // model.addAttribute("token", token);
+
+        // return "verification-result";
+
+        // } catch (Exception e) {
+        // System.err.println("❌ Verification page error: " + e.getMessage());
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Verification failed: " + e.getMessage());
+        // return "verification-result";
+        // }
+        // }
+
+        // @GetMapping("/verify-email-page")
+        // public String verifyEmailPage(@RequestParam String token, Model model) {
+        // try {
+        // System.out.println("🌐 Verification page requested for token: " + token);
+
+        // // Try repository method first
+        // Optional<User> userOpt = userRepository.findByVerificationToken(token);
+
+        // // If repository method fails, try manual search
+        // if (userOpt.isEmpty()) {
+        // System.out.println("⚠️ Repository method failed, trying manual search...");
+        // userOpt = userRepository.findAll().stream()
+        // .filter(u -> token.equals(u.getEmailVerificationToken()))
+        // .findFirst();
+        // }
+
+        // if (userOpt.isEmpty()) {
+        // System.out.println("❌ Token not found: " + token);
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Invalid verification token: " + token);
+        // model.addAttribute("token", token);
+        // return "verification-result";
+        // }
+
+        // User user = userOpt.get();
+        // System.out.println("✅ Found user: " + user.getEmail() + " with token: "
+        // + user.getEmailVerificationToken());
+
+        // // Check if already verified
+        // if (user.isEmailVerified()) {
+        // System.out.println("ℹ️ User already verified: " + user.getEmail());
+        // model.addAttribute("success", true);
+        // model.addAttribute("message", "Email already verified");
+        // model.addAttribute("token", token);
+        // return "verification-result";
+        // }
+
+        // // Check if token expired
+        // if (user.getTokenExpiry() != null &&
+        // user.getTokenExpiry().isBefore(Instant.now())) {
+        // System.out.println("❌ Token expired for: " + user.getEmail());
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Verification token has expired");
+        // model.addAttribute("token", token);
+        // return "verification-result";
+        // }
+
+        // // Verify the user
+        // user.setEmailVerified(true);
+        // user.setEmailVerificationToken(null);
+        // user.setTokenExpiry(null);
+        // userRepository.save(user);
+
+        // System.out.println("🎉 Email verified successfully for: " + user.getEmail());
+
+        // model.addAttribute("success", true);
+        // model.addAttribute("message", "Email verified successfully!");
+        // model.addAttribute("token", token);
+
+        // return "verification-result";
+
+        // } catch (Exception e) {
+        // System.err.println("💥 Verification page error: " + e.getMessage());
+        // e.printStackTrace();
+        // model.addAttribute("success", false);
+        // model.addAttribute("message", "Verification failed: " + e.getMessage());
+        // model.addAttribute("token", token);
+        // return "verification-result";
+        // }
+        // } THIS ONE WAS TESTED AND GOOD
+
         @GetMapping("/verify-email-page")
         public String verifyEmailPage(@RequestParam String token, Model model) {
-                model.addAttribute("token", token);
-                return "public/verif-email"; // This should match your HTML template name
+                try {
+                        System.out.println("🌐 Verifying token: " + token);
+
+                        // Use the reliable @Query method
+                        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+
+                        if (userOpt.isEmpty()) {
+                                System.out.println("❌ Token not found: " + token);
+                                model.addAttribute("success", false);
+                                model.addAttribute("message", "Invalid verification token");
+                                return "verification-result";
+                        }
+
+                        User user = userOpt.get();
+                        System.out.println("✅ Found user: " + user.getEmail());
+
+                        // Check if already verified
+                        if (user.isEmailVerified()) {
+                                model.addAttribute("success", true);
+                                model.addAttribute("message", "Email already verified");
+                                return "verification-result";
+                        }
+
+                        // Verify the user
+                        user.setEmailVerified(true);
+                        user.setEmailVerificationToken(null); // Clear the token
+                        user.setTokenExpiry(null);
+                        userRepository.save(user);
+
+                        System.out.println("🎉 Email verified: " + user.getEmail());
+
+                        model.addAttribute("success", true);
+                        model.addAttribute("message", "Email verified successfully!");
+                        return "verification-result";
+
+                } catch (Exception e) {
+                        System.err.println("💥 Verification error: " + e.getMessage());
+                        model.addAttribute("success", false);
+                        model.addAttribute("message", "Verification failed");
+                        return "verification-result";
+                }
+        }
+
+        // For debugging
+        @GetMapping("/debug/find-by-token/{token}")
+        public ResponseEntity<Map<String, Object>> debugFindByToken(@PathVariable String token) {
+                try {
+                        System.out.println("🔍 Searching for token: " + token);
+
+                        // Test the repository method directly
+                        Optional<User> userOpt = userRepository.findByEmailVerificationToken(token);
+
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("token", token);
+                        result.put("repositoryMethodWorked", userOpt.isPresent());
+                        result.put("email_verified", userOpt.map(User::isEmailVerified).orElse(null));
+
+                        if (userOpt.isPresent()) {
+                                User user = userOpt.get();
+                                result.put("userEmail", user.getEmail());
+                                result.put("foundWithToken", user.getEmailVerificationToken());
+                        } else {
+                                // Try manual query as fallback
+                                List<User> allUsers = userRepository.findAll();
+                                User manualFound = allUsers.stream()
+                                                .filter(u -> token.equals(u.getEmailVerificationToken()))
+                                                .findFirst()
+                                                .orElse(null);
+
+                                result.put("manualSearchWorked", manualFound != null);
+                                if (manualFound != null) {
+                                        result.put("manualFoundEmail", manualFound.getEmail());
+                                }
+                        }
+
+                        return ResponseEntity.ok(result);
+
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(Map.of("error", e.getMessage()));
+                }
         }
 
         @PostMapping("/verify-email")
@@ -413,7 +664,7 @@ public class UserController {
                         User user = userService.verifyEmail(token);
 
                         // Send confirmation email
-                        emailService.sendAccountVerifiedEmail(user.getEmail(), user.getUsername());
+                        emailService.sendAccountVerifiedEmail(user.getEmail(), user.getName());
 
                         return ResponseEntity.ok(Map.of(
                                         "message", "Email verified successfully",
@@ -435,7 +686,7 @@ public class UserController {
                                         .orElseThrow(() -> new RuntimeException("Invalid token"));
 
                         // Send account verified email
-                        emailService.sendAccountVerifiedEmail(user.getEmail(), user.getUsername());
+                        emailService.sendAccountVerifiedEmail(user.getEmail(), user.getName());
 
                         auditService.logSecurityEvent(user.getId(), "ACCOUNT_VERIFIED",
                                         "Email verification completed");
@@ -459,7 +710,7 @@ public class UserController {
                         String resetToken = userService.generatePasswordResetToken(user.getId());
 
                         // Send password reset email
-                        emailService.sendPasswordResetEmail(user.getEmail(), resetToken, user.getUsername());
+                        emailService.sendPasswordResetEmail(user.getEmail(), resetToken, user.getName());
 
                         auditService.logSecurityEvent(user.getId(), "PASSWORD_RESET_REQUESTED",
                                         "Password reset link sent");
@@ -486,7 +737,7 @@ public class UserController {
                         User user = userService.getUserByResetToken(request.getToken());
 
                         // Send password changed notification
-                        emailService.sendPasswordChangedEmail(user.getEmail(), user.getUsername());
+                        emailService.sendPasswordChangedEmail(user.getEmail(), user.getName());
 
                         auditService.logSecurityEvent(user.getId(), "PASSWORD_RESET_COMPLETED",
                                         "Password reset via reset token");
@@ -535,7 +786,7 @@ public class UserController {
                         // Send payment method added notification
                         emailService.sendPaymentMethodAdded(
                                         user.getEmail(),
-                                        user.getUsername(),
+                                        user.getName(),
                                         card.getLast4(),
                                         card.getBrand());
 
@@ -577,7 +828,7 @@ public class UserController {
                         cardRepository.delete(card);
 
                         // Send payment method removed notification
-                        emailService.sendPaymentMethodRemoved(user.getEmail(), user.getUsername(), last4, brand);
+                        emailService.sendPaymentMethodRemoved(user.getEmail(), user.getName(), last4, brand);
 
                         auditService.logSecurityEvent(user.getId(), "PAYMENT_METHOD_REMOVED",
                                         "Payment method removed: " + cardId);

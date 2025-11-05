@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+      .loading {
+        color: blue;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+      }
+    </style>
+    <!-- <script>
+      // Auto-redirect on success after 3 seconds
+      window.onload = function() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get('token');
+          const success = {{success}};
+
+          if (success && token) {
+              setTimeout(() => {
+                  window.location.href = '/api/auth/login-page?verified=true';
+              }, 3000);
+          }
+      };
+    </script> -->
+
+    <script th:inline="javascript">
+      // Auto-redirect on success after 3 seconds
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token");
+        const isSuccess = /*[[${success}]]*/ false;
+
+        if (isSuccess && token) {
+          setTimeout(() => {
+            window.location.href = "/api/auth/login-page?verified=true";
+          }, 3000);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div th:if="${success}">
+      <h1 class="success">✅ Email Verified Successfully!</h1>
+      <p>
+        Your email address has been verified. You can now log in to your
+        MoneyTransfer account.
+      </p>
+      <p>Redirecting to login in 3 seconds...</p>
+      <button onclick="window.location.href='/api/auth/login-page'">
+        Go to Login
+      </button>
+    </div>
+
+    <div th:unless="${success}">
+      <h1 class="error">❌ Verification Failed</h1>
+      <p th:text="${message}">
+        There was a problem verifying your email address.
+      </p>
+      <div>
+        <button onclick="window.location.reload()">Try Again</button>
+        <button onclick="window.location.href='/support'">
+          Contact Support
+        </button>
+      </div>
+    </div>
+
+    <!-- Debug info -->
+    <div
+      style="
+        margin-top: 50px;
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 5px;
+      "
+    >
+      <h3>Debug Information</h3>
+      <p><strong>Token:</strong> <span th:text="${token}">N/A</span></p>
+      <p>
+        <strong>Status:</strong>
+        <span th:text="${success} ? 'SUCCESS' : 'FAILED'">UNKNOWN</span>
+      </p>
+      <p>
+        <strong>Message:</strong> <span th:text="${message}">No message</span>
+      </p>
+    </div>
+  </body>
+</html>

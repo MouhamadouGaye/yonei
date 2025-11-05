@@ -97,12 +97,14 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendAccountVerificationEmail(String toEmail, String verificationToken, String username) {
+    public void sendAccountVerificationEmail(
+            String toEmail, String verificationToken, String name) { // the username - name
+
         String verificationUrl = baseUrl + "/api/users/verify-email-page?token=" +
                 verificationToken;
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable("name", name);
         context.setVariable("verificationUrl", verificationUrl);
         context.setVariable("companyName", companyName);
 

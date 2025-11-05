@@ -75,7 +75,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -85,6 +85,12 @@ public class User implements UserDetails {
 
     @Column(nullable = false, unique = true, length = 20)
     private String phoneNumber; // 📱 Added phone number
+
+    @Column(name = "country_code", length = 5)
+    private String countryCode;
+
+    @Column(name = "currency", length = 3)
+    private String currency; // ISO 4217 code (USD, EUR, etc.)
 
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal balance = BigDecimal.ZERO;
@@ -183,17 +189,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return Boolean.TRUE.equals(emailVerified);
     }
-
-    // public void setEmailVerified(boolean emailVerified) {
-    // this.emailVerified = emailVerified;
-    // }
-
-    // public String getEmailVerificationToken() {
-    // return emailVerificationToken;
-    // }
-
-    // public void setEmailVerificationToken(String emailVerificationToken) {
-    // this.emailVerificationToken = emailVerificationToken;
-    // }
 
 }

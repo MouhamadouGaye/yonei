@@ -5,12 +5,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.mgaye.yonei.entity.User;
+import com.mgaye.yonei.service.CountryCodeService;
+
 import lombok.Data;
 
 @Data
 public class UserDto {
     private Long id;
-    private String username;
+    private String Name;
     private String email;
     private String password;
     private String phoneNumber;
@@ -19,16 +21,18 @@ public class UserDto {
     private boolean authenticated; // This should reflect actual auth status
     private boolean requiresVerification;
     private String message;
+    private String currency;
 
     // ✅ FIXED: Check actual authentication status
     public static UserDto fromEntity(User user, boolean hasSavedCard) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
+        dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setHasSavedCard(hasSavedCard);
         dto.setEmailVerified(user.isEmailVerified());
+        dto.setCurrency(user.getCurrency());
 
         // 🔥 CRITICAL: Check actual authentication status from SecurityContext
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -49,4 +53,13 @@ public class UserDto {
         dto.setAuthenticated(true);
         return dto;
     }
+
+    // // ✅ Utility to detect currency from phone number
+    // public static String getCurrencyFromPhoneNumber(String phoneNumber) {
+
+    // CountryCodeService countryCodeService = new CountryCodeService();
+    // String currency = countryCodeService.getCurrencyByPhoneNumber(phoneNumber);
+    // return currency;
+
+    // }
 }

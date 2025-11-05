@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationRequest {
-    @NotBlank(message = "Username is required")
-    @Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
-    private String username;
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
