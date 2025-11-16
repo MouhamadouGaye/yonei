@@ -517,7 +517,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
 
             // FIX: Use the noreplyEmail directly or extract domain properly
-            String fromEmail = getFromEmail();
+            // String fromEmail = getFromEmail();
             try {
                 helper.setFrom(fromEmail, companyName);
             } catch (UnsupportedEncodingException e) {
